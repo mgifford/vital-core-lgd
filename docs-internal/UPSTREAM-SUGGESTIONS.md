@@ -34,9 +34,9 @@ and vital-core's open issues and PRs, and link instead of repeating.
 | 3 | Applying a profile needs a workflow edit | open (same as vital-core-nsf §8) |
 | 4 | README said not to use "Use this template" | merged upstream [vital-core#279](https://github.com/mgifford/vital-core/pull/279); merged here 2026-10-27 |
 | 5 | Shipped defaults assume a US federal fleet | open (related: vital-core-nsf §2, §3) |
-| 6 | Dependabot can't fix the `@vitest/mocker` advisory | PR [vital-core#280](https://github.com/mgifford/vital-core/pull/280) |
-| 7 | Wappalyzer fingerprints are stale | PR [vital-core#280](https://github.com/mgifford/vital-core/pull/280) |
-| 8 | A Lighthouse race crashes the whole scan | PR [vital-core#280](https://github.com/mgifford/vital-core/pull/280) |
+| 6 | Dependabot can't fix the `@vitest/mocker` advisory | merged upstream [vital-core#280](https://github.com/mgifford/vital-core/pull/280); merged here 2026-10-27 |
+| 7 | Wappalyzer fingerprints are stale | merged upstream [vital-core#280](https://github.com/mgifford/vital-core/pull/280); merged here 2026-10-27 |
+| 8 | A Lighthouse race crashes the whole scan | merged upstream [vital-core#280](https://github.com/mgifford/vital-core/pull/280); merged here 2026-10-27 |
 | 9 | One failed domain skips the optional report for all | open |
 
 ## 1. Spell check is US English only
@@ -118,8 +118,9 @@ with the legal baseline left to each fleet's config.
 
 ## 6. Dependabot can't fix the `@vitest/mocker` advisory
 
-Recorded 2026-10-27. **Status: PR
-[vital-core#280](https://github.com/mgifford/vital-core/pull/280).**
+Recorded 2026-10-27. **Status: merged upstream in
+[vital-core#280](https://github.com/mgifford/vital-core/pull/280); merged
+here 2026-10-27.**
 
 This repo's first Dependabot security run
 ([40595139585](https://github.com/mgifford/vital-core-lgd/actions/runs/40595139585))
@@ -133,8 +134,9 @@ Dependabot PR #1 (the later merge is clean).
 
 ## 7. Wappalyzer fingerprints are stale
 
-Recorded 2026-10-27. **Status: PR
-[vital-core#280](https://github.com/mgifford/vital-core/pull/280).**
+Recorded 2026-10-27. **Status: merged upstream in
+[vital-core#280](https://github.com/mgifford/vital-core/pull/280); merged
+here 2026-10-27.**
 
 Scans here warn "Wappalyzer fingerprints are 134 days old (vendored
 2026-06-15). Run scripts/update-wappalyzer.sh to refresh." `vendor/wappalyzer/`
@@ -143,8 +145,9 @@ an authenticated `gh`; nothing refreshes it on a schedule.
 
 ## 8. A Lighthouse race crashes the whole scan
 
-Recorded 2026-10-27. **Status: PR
-[vital-core#280](https://github.com/mgifford/vital-core/pull/280).**
+Recorded 2026-10-27. **Status: merged upstream in
+[vital-core#280](https://github.com/mgifford/vital-core/pull/280); merged
+here 2026-10-27.**
 
 The first `go.walsall.gov.uk` scan
 ([job](https://github.com/mgifford/vital-core-lgd/actions/runs/40596432079/job/122513577156))
