@@ -1,0 +1,27 @@
+# Profile: LocalGov Drupal
+#
+# A *profile* is a named scope over the site registry in `config/targets.yml`,
+# plus the report-level metadata (title, intro) for one published instance.
+# It does NOT redefine per-site scan settings — those stay in targets.yml.
+# See config/profiles/README.md.
+#
+# The report workflow builds with this profile through VITAL_PROFILE on its
+# Aggregate step (.github/workflows/report.yml).
+
+name: LocalGov Drupal
+
+# Targets by `domain` from targets.yml. Every one must exist there.
+targets:
+  - www.lbhf.gov.uk
+  - go.walsall.gov.uk
+  - www.blackburn.gov.uk
+  - www.hackney.gov.uk
+
+branding:
+  title: "LocalGov Drupal Accessibility & Sustainability"
+  intro: >
+    Automated weekly accessibility and sustainability monitoring of UK
+    council websites built on LocalGov Drupal.
+
+# CSV links use report_base_url from targets.yml; leave this empty.
+report_base_url: ""

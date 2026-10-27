@@ -11,15 +11,15 @@
 # coverage: 100 x 5 ~= 500 pages/week/domain (more for higher importance).
 
 defaults:
-  pages_per_run: 150        # max pages scanned per domain per workflow run (keeps runs < 2h)
-  max_pages_per_week: 10000  # hard weekly cap per domain
+  pages_per_run: 50         # max pages scanned per domain per workflow run (keeps runs < 2h)
+  max_pages_per_week: 2000  # hard weekly cap per domain; a conservative start for council sites
   delay_ms: 1500            # pause between page loads (politeness)
   nav_timeout_ms: 30000     # page navigation timeout
   networkidle_cap_ms: 8000  # max wait for network-idle after load; passive listening (sends nothing), so capping never adds server load
   settle_delay_ms: 1000     # wait after load + network-idle before auditing (avoids pre-hydration false positives)
   max_crawl_depth: 10        # BFS depth from seeds
   retention_weeks: 2        # page-level detail kept this long; weekly summaries kept forever
-  user_agent: "vital-scans/0.1 (+https://github.com/mgifford/vital-core; accessibility and sustainability monitoring)"
+  user_agent: "vital-scans/0.1 (+https://github.com/mgifford/vital-core-lgd; accessibility and sustainability monitoring)"
   reporting:
     max_html_issues: 50
     moderate_issue_threshold_percent: 5
@@ -37,18 +37,21 @@ defaults:
     score_format: both
   finding_policy:
     # version/level is the build target: everything new should meet WCAG
-    # 2.2 AA. legal_baseline is the legal minimum: Section 508 (36 CFR 1194)
-    # incorporates WCAG 2.0 Level A and AA. Required findings within the
-    # baseline are reported as "Legally required"; the rest of the target
-    # (WCAG 2.1/2.2 A/AA additions) as "Target". AAA is aspirational and
+    # 2.2 AA. legal_baseline is the legal minimum: the Public Sector Bodies
+    # (Websites and Mobile Applications) Accessibility Regulations 2018
+    # require EN 301 549, which incorporates WCAG 2.1 Level A and AA. GDS
+    # monitoring has also tested the WCAG 2.2 additions since October 2024;
+    # set version "2.2" here to report those as legally required too.
+    # Required findings within the baseline are reported as "Legally
+    # required"; the rest of the target as "Target". AAA is aspirational and
     # best practices are advisory; neither is ranked with requirements.
     conformance:
       standard: WCAG
       version: "2.2"
       level: AA
       legal_baseline:
-        name: Section 508
-        version: "2.0"
+        name: UK accessibility regulations (PSBAR 2018)
+        version: "2.1"
         level: AA
     defaults:
       wcag_a_aa:
@@ -78,13 +81,13 @@ sustainability_metric: energy
 # Base URL for published reports (used to generate absolute links in CSV exports
 # so that affected_pages_csv cells are clickable in Google Sheets / Excel).
 # Trailing slash is optional. Leave empty to keep CSV links relative.
-report_base_url: "https://mgifford.github.io/vital-core"
+report_base_url: "https://mgifford.github.io/vital-core-lgd"
 
 # Scan data (data/) lives in its own repository, checked out into data/ by
 # scan.yml and report.yml, so cloning this repo gets code only. A target may
 # override it, but CI currently needs every non-hf_only target on one repo.
 # hf_only (VA) targets may not set it: their data never goes to git.
-data_repo: mgifford/vital-core-data
+data_repo: mgifford/vital-core-lgd-data
 
 # Report languages. Each report is rendered once per listed language; the
 # `default_language` keeps the canonical (unsuffixed) file paths — e.g.
@@ -97,7 +100,7 @@ data_repo: mgifford/vital-core-data
 # Supported: en, fr, ja, nl. Translations are human-reviewed catalogs in
 # src/locales/<lang>.json; any missing string falls back to English, so partial
 # catalogs are safe. A target may override either key (e.g. Canada: [en, fr]).
-languages: [en, fr, ja, nl]
+languages: [en]
 default_language: en
 
 # Show the visible header language switcher. The ?lang= / localStorage runtime
@@ -265,90 +268,10 @@ targets:
   #   webmcp: optional boolean, default false. Opt-in only — omit or set to
   #     false to leave a target unaffected. Example: webmcp: true
   #
-  # WAF-blocked: hhs.gov and nih.gov return 403 "Access Denied" to
-  # automated browsers and record as blocked with no audit data until the
-  # scanner's user-agent is allowlisted. Kept in to track once access is
-  # sorted — see WAF-ALLOWLIST.md for the request template and status.
-  - domain: www.cms.gov
-    importance: 5
-    pages_per_run: 90   # memory guard: lower per-run concurrency/load for this large domain
-    priority_urls_file: profiles/www.cms.gov-top-tasks.txt
-
-    # DRAFT, NOT YET IMPLEMENTED.
-    # Previously scanned ordinary URLs become eligible after seven days.
-    url_rescan_interval_days: 7
-    # DRAFT, NOT YET IMPLEMENTED.
-    # Priority URLs remain weekly, as requested.
-    priority_url_rescan_interval_days: 7
-    
-    url_exclude_patterns: [".aspx"]
-    design_system: cms-ds
-    design_system_theme: default
-    webmcp: true
-    sampling:
-      alfa: 15       # stronger memory guard: reduce heavy DOM snapshot workload
-      resources: 75  # reduce large-resource cataloging pressure on peak heap
-      images: 75     # reduce image inventory payload on this high-volume target
-  - domain: www.medicare.gov
-    importance: 5
-
-    # DRAFT, NOT YET IMPLEMENTED.
-    domain_scan_cadence: incremental
-    url_rescan_interval_days: 7
-    priority_url_rescan_interval_days: 7
-    
-    design_system: cms-ds
-    design_system_theme: medicare
-    webmcp: true
-    sampling:
-      alfa: 25   # same memory guard as www.cms.gov (importance 5, 150 pages/run)
-  - domain: www.medicaid.gov
-    importance: 5
-    finding_policy:
-      rules:
-        - match:
-            engine: alfa
-            rule_id: sia-r113
-          obligation: required
-          handling: review
-          reason: >-
-            WCAG 2.5.8 target-size results can require manual verification of
-            spacing, equivalent controls, and essential-size exceptions.
-          evidence:
-            - https://alfa.siteimprove.com/rules/sia-r113
-  - domain: data.healthcare.gov
-    importance: 3                  # open-data site; pages are template-similar
-  - domain: openpaymentsdata.cms.gov
-    importance: 3                  # open-data site; lighthouse disabled (perf:6-55 → audits take 2-5 min each)
-    webmcp: true
-    sampling:
-      lighthouse: 0
-  - domain: www.cdc.gov
-    importance: 1
-    sampling:
-      alfa: 25   # memory guard: keeps Alfa's in-memory DOM snapshots below the runner heap limit
-  - domain: data.cms.gov
-    importance: 3                  # open-data site
-  - domain: data.medicaid.gov
-    importance: 3                  # open-data site
-  - domain: www.healthcare.gov
-    importance: 3
-  - domain: nih.gov            # WAF-blocked (see WAF-ALLOWLIST.md)
-    importance: 1
-  - domain: hhs.gov            # WAF-blocked (see WAF-ALLOWLIST.md)
-    importance: 1
-
-  # Department of Veterans Affairs — scanned ONLY via the "va" profile on
-  # Hugging Face. hf_only: true prevents these from running in GitHub Actions.
-  - domain: www.va.gov
-    importance: 5
-    hf_only: true
-  - domain: volunteer.va.gov
-    importance: 3
-    hf_only: true
-  - domain: news.va.gov
-    importance: 3
-    hf_only: true
-  - domain: benefits.va.gov
-    importance: 3
-    hf_only: true
+  # LocalGov Drupal councils (https://localgovdrupal.org/). All four run the
+  # same distribution, so a finding that recurs across them may come from
+  # shared distribution code rather than one council's content.
+  - domain: www.lbhf.gov.uk        # London Borough of Hammersmith & Fulham
+  - domain: go.walsall.gov.uk      # Walsall Council
+  - domain: www.blackburn.gov.uk   # Blackburn with Darwen Borough Council
+  - domain: www.hackney.gov.uk     # London Borough of Hackney
