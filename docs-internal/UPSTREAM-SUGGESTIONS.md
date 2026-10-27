@@ -34,8 +34,10 @@ and vital-core's open issues and PRs, and link instead of repeating.
 | 3 | Applying a profile needs a workflow edit | open (same as vital-core-nsf §8) |
 | 4 | README said not to use "Use this template" | merged upstream [vital-core#279](https://github.com/mgifford/vital-core/pull/279); merged here 2026-10-27 |
 | 5 | Shipped defaults assume a US federal fleet | open (related: vital-core-nsf §2, §3) |
-| 6 | Dependabot can't fix the `@vitest/mocker` advisory | PR [vital-core#280](https://github.com/mgifford/vital-core/pull/280) |
-| 7 | Wappalyzer fingerprints are stale | PR [vital-core#280](https://github.com/mgifford/vital-core/pull/280) |
+| 6 | Dependabot can't fix the `@vitest/mocker` advisory | merged upstream [vital-core#280](https://github.com/mgifford/vital-core/pull/280); merged here 2026-10-27 |
+| 7 | Wappalyzer fingerprints are stale | merged upstream [vital-core#280](https://github.com/mgifford/vital-core/pull/280); merged here 2026-10-27 |
+| 8 | A Lighthouse race crashes the whole scan | merged upstream [vital-core#280](https://github.com/mgifford/vital-core/pull/280); merged here 2026-10-27 |
+| 9 | One failed domain skips the optional report for all | open |
 
 ## 1. Spell check is US English only
 
@@ -116,8 +118,9 @@ with the legal baseline left to each fleet's config.
 
 ## 6. Dependabot can't fix the `@vitest/mocker` advisory
 
-Recorded 2026-10-27. **Status: PR
-[vital-core#280](https://github.com/mgifford/vital-core/pull/280).**
+Recorded 2026-10-27. **Status: merged upstream in
+[vital-core#280](https://github.com/mgifford/vital-core/pull/280); merged
+here 2026-10-27.**
 
 This repo's first Dependabot security run
 ([40595139585](https://github.com/mgifford/vital-core-lgd/actions/runs/40595139585))
@@ -131,10 +134,41 @@ Dependabot PR #1 (the later merge is clean).
 
 ## 7. Wappalyzer fingerprints are stale
 
-Recorded 2026-10-27. **Status: PR
-[vital-core#280](https://github.com/mgifford/vital-core/pull/280).**
+Recorded 2026-10-27. **Status: merged upstream in
+[vital-core#280](https://github.com/mgifford/vital-core/pull/280); merged
+here 2026-10-27.**
 
 Scans here warn "Wappalyzer fingerprints are 134 days old (vendored
 2026-06-15). Run scripts/update-wappalyzer.sh to refresh." `vendor/wappalyzer/`
 is shared with every fleet, so the refresh belongs upstream. The script needs
 an authenticated `gh`; nothing refreshes it on a schedule.
+
+## 8. A Lighthouse race crashes the whole scan
+
+Recorded 2026-10-27. **Status: merged upstream in
+[vital-core#280](https://github.com/mgifford/vital-core/pull/280); merged
+here 2026-10-27.**
+
+The first `go.walsall.gov.uk` scan
+([job](https://github.com/mgifford/vital-core-lgd/actions/runs/40596432079/job/122513577156))
+exited with "Protocol error (Target.getTargetInfo): Session with given id not
+found" from Lighthouse's `target-manager.js`. Lighthouse ignores "Target
+closed" when a page removes an iframe or worker before it finishes attaching,
+but rethrows this wording of the same race from an event listener, so it is
+an unhandled rejection and Node exits. The other three councils were fine,
+and Walsall's pages scanned before the crash were committed. Still present in
+lighthouse 13.6.0. #280 ignores exactly that error while Lighthouse runs and
+still crashes on anything else.
+
+Also worth reporting to Lighthouse (GoogleChrome/lighthouse), so the guard can
+be removed once a release treats it like "Target closed".
+
+## 9. One failed domain skips the optional report for all
+
+Recorded 2026-10-27. **Status: open.**
+
+In the same run, the `optional-report` job was skipped because it requires
+`needs.scan.result == 'success'`, and Walsall's job had failed. Each domain's
+data is committed on its own, so the three councils that worked could have
+been reported. Suggested fix in upstream `scan.yml`: also accept
+`needs.scan.result == 'failure'` (not `cancelled`) for the optional report.
