@@ -32,8 +32,10 @@ and vital-core's open issues and PRs, and link instead of repeating.
 | 1 | Spell check is US English only | open |
 | 2 | `.gov.uk` fails the government-domain check | open |
 | 3 | Applying a profile needs a workflow edit | open (same as vital-core-nsf §8) |
-| 4 | README said not to use "Use this template" | PR [vital-core#279](https://github.com/mgifford/vital-core/pull/279) |
+| 4 | README said not to use "Use this template" | merged upstream [vital-core#279](https://github.com/mgifford/vital-core/pull/279); merged here 2026-10-27 |
 | 5 | Shipped defaults assume a US federal fleet | open (related: vital-core-nsf §2, §3) |
+| 6 | Dependabot can't fix the `@vitest/mocker` advisory | PR [vital-core#280](https://github.com/mgifford/vital-core/pull/280) |
+| 7 | Wappalyzer fingerprints are stale | PR [vital-core#280](https://github.com/mgifford/vital-core/pull/280) |
 
 ## 1. Spell check is US English only
 
@@ -80,8 +82,9 @@ Suggested fix: `VITAL_PROFILE: ${{ vars.VITAL_PROFILE }}` in upstream's
 
 ## 4. README said not to use "Use this template"
 
-Recorded 2026-10-27. **Status: PR
-[vital-core#279](https://github.com/mgifford/vital-core/pull/279).**
+Recorded 2026-10-27. **Status: merged upstream in
+[vital-core#279](https://github.com/mgifford/vital-core/pull/279); merged
+here 2026-10-27.**
 
 vital-core is a GitHub template, and this repo was made with "Use this
 template". But the README told people not to use it, without saying how to
@@ -110,3 +113,28 @@ Suggested fix: ship the engine defaults separately from a fleet's targets,
 for example as a `config/targets.example.yml`, as vital-core-nsf §3
 suggests. Also word the `AGENTS.md` mission so it fits any government,
 with the legal baseline left to each fleet's config.
+
+## 6. Dependabot can't fix the `@vitest/mocker` advisory
+
+Recorded 2026-10-27. **Status: PR
+[vital-core#280](https://github.com/mgifford/vital-core/pull/280).**
+
+This repo's first Dependabot security run
+([40595139585](https://github.com/mgifford/vital-core-lgd/actions/runs/40595139585))
+failed with "security update not possible" for `@vitest/mocker` 4.1.11
+(fixed in 4.1.12). `vitest` pins `@vitest/mocker` exactly, and `vitest` is a
+production dependency through `@siteimprove/alfa-test-utils` →
+`@siteimprove/alfa-test` (`vitest@^4.1.8`), so the fix is to move `vitest`
+itself. The lockfile is shared with every fleet, so #280 does it upstream; it
+also moves `fast-uri` to 3.1.9, which this repo already has from its
+Dependabot PR #1 (the later merge is clean).
+
+## 7. Wappalyzer fingerprints are stale
+
+Recorded 2026-10-27. **Status: PR
+[vital-core#280](https://github.com/mgifford/vital-core/pull/280).**
+
+Scans here warn "Wappalyzer fingerprints are 134 days old (vendored
+2026-06-15). Run scripts/update-wappalyzer.sh to refresh." `vendor/wappalyzer/`
+is shared with every fleet, so the refresh belongs upstream. The script needs
+an authenticated `gh`; nothing refreshes it on a schedule.
