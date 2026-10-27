@@ -216,6 +216,8 @@ jobs:
         run: npm ci --omit=optional --ignore-scripts
 
       - name: Aggregate
+        env:
+          VITAL_PROFILE: lgd
         run: node src/aggregate.js
 
       - name: Prune old page-level detail
