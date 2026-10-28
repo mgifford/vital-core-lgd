@@ -12,10 +12,10 @@ name: LocalGov Drupal
 
 # Targets by `domain` from targets.yml. Every one must exist there.
 targets:
-  - www.lbhf.gov.uk
+  - lbhf.gov.uk
   - go.walsall.gov.uk
-  - www.blackburn.gov.uk
-  - www.hackney.gov.uk
+  - blackburn.gov.uk
+  - hackney.gov.uk
 
 branding:
   title: "LocalGov Drupal Accessibility & Sustainability"

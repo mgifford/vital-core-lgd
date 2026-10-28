@@ -38,6 +38,8 @@ and vital-core's open issues and PRs, and link instead of repeating.
 | 7 | Wappalyzer fingerprints are stale | merged upstream [vital-core#280](https://github.com/mgifford/vital-core/pull/280); merged here 2026-10-27 |
 | 8 | A Lighthouse race crashes the whole scan | merged upstream [vital-core#280](https://github.com/mgifford/vital-core/pull/280); merged here 2026-10-27 |
 | 9 | One failed domain skips the optional report for all | merged upstream [vital-core#281](https://github.com/mgifford/vital-core/pull/281); merged here 2026-10-28 |
+| 10 | A homepage redirect to another subdomain stops the crawl | open |
+| 11 | A page that fails three times is never retried | open |
 
 ## 1. Spell check is US English only
 
@@ -185,3 +187,39 @@ In the same run, the `optional-report` job was skipped because it requires
 data is committed on its own, so the three councils that worked could have
 been reported. Suggested fix in upstream `scan.yml`: also accept
 `needs.scan.result == 'failure'` (not `cancelled`) for the optional report.
+
+## 10. A homepage redirect to another subdomain stops the crawl
+
+Recorded 2026-10-28. **Status: open.**
+
+The crawler keeps a link only when its host matches `target.domain`, with a
+leading `www.` ignored (`normalizeUrl` in `src/lib/urls.js`; `src/scan.js`
+around line 388). Walsall serves its pages and links from
+`go.walsall.gov.uk`, so a target of `walsall.gov.uk` that redirects there
+would drop every link and scan only the homepage. This fleet therefore keeps
+`go.walsall.gov.uk`. Other councils may use a similar subdomain.
+
+Suggested fix: when the homepage (or the first seed) redirects to a
+different host on the same registrable domain, log it and scope links to the
+final host, or fail the config check with a message saying which host to
+use.
+
+## 11. A page that fails three times is never retried
+
+Recorded 2026-10-28. **Status: open.**
+
+`www.blackburn.gov.uk` timed out on its homepage in all three first-week
+runs (30 s `page.goto` timeouts; 0 pages recorded). Each failure increments
+`failCount`, which only resets on a successful scan (`src/scan.js` around
+line 426), but `pickBatch()` and `budgetStatus()` skip pages with
+`failCount >= 3` (`src/lib/state.js`). So the homepage is never tried
+again, the domain's frontier counts as empty, and the scheduled matrix
+skips the domain from then on. A site that is down for three runs in a row
+drops out for good. This fleet sidestepped it by renaming the target to
+`blackburn.gov.uk` (a new key, so fresh crawl state) and raising its
+`nav_timeout_ms` to 60000.
+
+Suggested fix: let failed pages be retried after a cool-off, for example
+once per ISO week, or reset `failCount` when a new week starts, so a
+temporary outage costs a week's coverage at most.
+
