@@ -29,19 +29,22 @@ and vital-core's open issues and PRs, and link instead of repeating.
 
 | # | Suggestion | Status |
 |---|---|---|
-| 1 | Spell check is US English only | open |
-| 2 | `.gov.uk` fails the government-domain check | open |
+| 1 | Spell check is US English only | merged upstream [vital-core#281](https://github.com/mgifford/vital-core/pull/281); merged here 2026-10-28 (`spelling_locale: en-GB`) |
+| 2 | `.gov.uk` fails the government-domain check | merged upstream [vital-core#281](https://github.com/mgifford/vital-core/pull/281); merged here 2026-10-28 |
 | 3 | Applying a profile needs a workflow edit | open (same as vital-core-nsf §8) |
 | 4 | README said not to use "Use this template" | merged upstream [vital-core#279](https://github.com/mgifford/vital-core/pull/279); merged here 2026-10-27 |
-| 5 | Shipped defaults assume a US federal fleet | open (related: vital-core-nsf §2, §3) |
+| 5 | Shipped defaults assume a US federal fleet | dropped: vital-core is the CMS fleet, so its US defaults are correct there |
 | 6 | Dependabot can't fix the `@vitest/mocker` advisory | merged upstream [vital-core#280](https://github.com/mgifford/vital-core/pull/280); merged here 2026-10-27 |
 | 7 | Wappalyzer fingerprints are stale | merged upstream [vital-core#280](https://github.com/mgifford/vital-core/pull/280); merged here 2026-10-27 |
 | 8 | A Lighthouse race crashes the whole scan | merged upstream [vital-core#280](https://github.com/mgifford/vital-core/pull/280); merged here 2026-10-27 |
-| 9 | One failed domain skips the optional report for all | open |
+| 9 | One failed domain skips the optional report for all | merged upstream [vital-core#281](https://github.com/mgifford/vital-core/pull/281); merged here 2026-10-28 |
 
 ## 1. Spell check is US English only
 
-Recorded 2026-10-27. **Status: open.**
+Recorded 2026-10-27. **Status: merged upstream in
+[vital-core#281](https://github.com/mgifford/vital-core/pull/281); merged
+here 2026-10-28.**
+This fleet sets `spelling_locale: en-GB` in `config/targets.yml`.
 
 `src/lib/spell.js:4` loads `dictionary-en`, which is US English. Councils
 write British English, so words like "organisation", "colour", "centre" and
@@ -57,7 +60,9 @@ would then set `spelling_locale: en-GB`.
 
 ## 2. `.gov.uk` fails the government-domain check
 
-Recorded 2026-10-27. **Status: open.**
+Recorded 2026-10-27. **Status: merged upstream in
+[vital-core#281](https://github.com/mgifford/vital-core/pull/281); merged
+here 2026-10-28.**
 
 `src/engines/security.js:16` checks the host against
 `['.gov', '.mil', '.edu', '.fed.us']`, labelled "Sponsored government TLD
@@ -97,7 +102,13 @@ This repo's join is in
 
 ## 5. Shipped defaults assume a US federal fleet
 
-Recorded 2026-10-27. **Status: open**, related to vital-core-nsf §2 and §3.
+Recorded 2026-10-27. **Status: dropped** (2026-10-28).
+
+vital-core is itself the CMS fleet, and every CMS site is in the US, so its
+`config/targets.yml`, Section 508 baseline, `en-US` spelling and
+`AGENTS.md` mission are correct for vital-core. A fleet made from the
+template replaces `targets.yml` anyway (README "Setting up a new
+instance", step 3). The original note is kept below for the record.
 
 Setting up this fleet meant changing almost every global value in
 `config/targets.yml`:
@@ -165,7 +176,9 @@ be removed once a release treats it like "Target closed".
 
 ## 9. One failed domain skips the optional report for all
 
-Recorded 2026-10-27. **Status: open.**
+Recorded 2026-10-27. **Status: merged upstream in
+[vital-core#281](https://github.com/mgifford/vital-core/pull/281); merged
+here 2026-10-28.**
 
 In the same run, the `optional-report` job was skipped because it requires
 `needs.scan.result == 'success'`, and Walsall's job had failed. Each domain's
