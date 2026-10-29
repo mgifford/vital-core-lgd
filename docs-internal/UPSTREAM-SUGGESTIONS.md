@@ -41,6 +41,7 @@ and vital-core's open issues and PRs, and link instead of repeating.
 | 10 | A homepage redirect to another subdomain stops the crawl | open |
 | 11 | A page that fails three times is never retried | open |
 | 12 | No way to see why a site won't load for the scanner | merged upstream [vital-core#282](https://github.com/mgifford/vital-core/pull/282) (`diagnose` workflow); merged here 2026-10-29 |
+| 13 | Renaming a target's domain drops its history from the report | open |
 
 ## 1. Spell check is US English only
 
@@ -199,6 +200,8 @@ around line 388). Walsall serves its pages and links from
 `go.walsall.gov.uk`, so a target of `walsall.gov.uk` that redirects there
 would drop every link and scan only the homepage. This fleet therefore keeps
 `go.walsall.gov.uk`. Other councils may use a similar subdomain.
+The diagnose run on 2026-10-29 confirmed it: `walsall.gov.uk` and
+`www.walsall.gov.uk` both answer 301 to `go.walsall.gov.uk`.
 
 Suggested fix: when the homepage (or the first seed) redirects to a
 different host on the same registrable domain, log it and scope links to the
@@ -238,3 +241,19 @@ can't reach the sites. vital-core#282 adds a manual `diagnose` workflow
 (`scripts/probe-targets.js`) that reports all of these from GitHub's
 network. Run it (Actions → diagnose) before asking a council to allowlist
 the scanner.
+
+## 13. Renaming a target's domain drops its history from the report
+
+Recorded 2026-10-29. **Status: open.**
+
+`domainKey()` uses the configured domain verbatim, and the data directory,
+the crawl-state asset and the report path all hang off that key. On
+2026-10-28 this fleet renamed `www.hackney.gov.uk` to `hackney.gov.uk` and
+`www.lbhf.gov.uk` to `lbhf.gov.uk`, although both apexes only redirect to
+`www.`. Hackney's 498 pages from that week dropped out of the report, its
+crawl restarted at 50 pages, and the next report listed one council of five.
+Nothing warned about it. This fleet reverted both names on 2026-10-29.
+
+Suggested fix: a `previous_domains:` list per target that aggregate and the
+crawl-state restore read as aliases, or at least a config check that warns
+when a target has no data directory but a `www.`-equivalent one does.

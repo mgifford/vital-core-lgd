@@ -281,12 +281,15 @@ targets:
   # distribution, so a finding that recurs across them may come from shared
   # distribution code rather than one council's content.
   #
-  # Use the host each site actually serves its pages from: the crawler treats
+  # Use the host each site actually serves its pages from (run Actions →
+  # diagnose to see where the homepage redirects): the crawler treats
   # example.gov.uk and www.example.gov.uk as one site, but any other
   # subdomain as a different one, and it drops links to a different site.
-  - domain: lbhf.gov.uk            # Hammersmith & Fulham Council
+  # Don't rename a target once it has data: its data, crawl state and
+  # report are keyed on the exact domain, so a rename starts it over.
+  - domain: www.lbhf.gov.uk        # Hammersmith & Fulham Council; AWS WAF challenges GitHub's runners (diagnose, 2026-10-29)
   - domain: go.walsall.gov.uk      # Walsall Council; its pages and links use go.walsall.gov.uk
   - domain: blackburn.gov.uk       # Blackburn with Darwen Council
     nav_timeout_ms: 60000          # its homepage timed out at 30 s on every first-week run
-  - domain: hackney.gov.uk         # Hackney Council
+  - domain: www.hackney.gov.uk     # Hackney Council
   - domain: www.luton.gov.uk       # Luton Borough Council
