@@ -29,19 +29,25 @@ and vital-core's open issues and PRs, and link instead of repeating.
 
 | # | Suggestion | Status |
 |---|---|---|
-| 1 | Spell check is US English only | open |
-| 2 | `.gov.uk` fails the government-domain check | open |
+| 1 | Spell check is US English only | merged upstream [vital-core#281](https://github.com/mgifford/vital-core/pull/281); merged here 2026-10-28 (`spelling_locale: en-GB`) |
+| 2 | `.gov.uk` fails the government-domain check | merged upstream [vital-core#281](https://github.com/mgifford/vital-core/pull/281); merged here 2026-10-28 |
 | 3 | Applying a profile needs a workflow edit | open (same as vital-core-nsf §8) |
 | 4 | README said not to use "Use this template" | merged upstream [vital-core#279](https://github.com/mgifford/vital-core/pull/279); merged here 2026-10-27 |
-| 5 | Shipped defaults assume a US federal fleet | open (related: vital-core-nsf §2, §3) |
+| 5 | Shipped defaults assume a US federal fleet | dropped: vital-core is the CMS fleet, so its US defaults are correct there |
 | 6 | Dependabot can't fix the `@vitest/mocker` advisory | merged upstream [vital-core#280](https://github.com/mgifford/vital-core/pull/280); merged here 2026-10-27 |
 | 7 | Wappalyzer fingerprints are stale | merged upstream [vital-core#280](https://github.com/mgifford/vital-core/pull/280); merged here 2026-10-27 |
 | 8 | A Lighthouse race crashes the whole scan | merged upstream [vital-core#280](https://github.com/mgifford/vital-core/pull/280); merged here 2026-10-27 |
-| 9 | One failed domain skips the optional report for all | open |
+| 9 | One failed domain skips the optional report for all | merged upstream [vital-core#281](https://github.com/mgifford/vital-core/pull/281); merged here 2026-10-28 |
+| 10 | A homepage redirect to another subdomain stops the crawl | open |
+| 11 | A page that fails three times is never retried | open |
+| 12 | No way to see why a site won't load for the scanner | merged upstream [vital-core#282](https://github.com/mgifford/vital-core/pull/282) (`diagnose` workflow); merged here 2026-10-29 |
 
 ## 1. Spell check is US English only
 
-Recorded 2026-10-27. **Status: open.**
+Recorded 2026-10-27. **Status: merged upstream in
+[vital-core#281](https://github.com/mgifford/vital-core/pull/281); merged
+here 2026-10-28.**
+This fleet sets `spelling_locale: en-GB` in `config/targets.yml`.
 
 `src/lib/spell.js:4` loads `dictionary-en`, which is US English. Councils
 write British English, so words like "organisation", "colour", "centre" and
@@ -57,7 +63,9 @@ would then set `spelling_locale: en-GB`.
 
 ## 2. `.gov.uk` fails the government-domain check
 
-Recorded 2026-10-27. **Status: open.**
+Recorded 2026-10-27. **Status: merged upstream in
+[vital-core#281](https://github.com/mgifford/vital-core/pull/281); merged
+here 2026-10-28.**
 
 `src/engines/security.js:16` checks the host against
 `['.gov', '.mil', '.edu', '.fed.us']`, labelled "Sponsored government TLD
@@ -97,7 +105,13 @@ This repo's join is in
 
 ## 5. Shipped defaults assume a US federal fleet
 
-Recorded 2026-10-27. **Status: open**, related to vital-core-nsf §2 and §3.
+Recorded 2026-10-27. **Status: dropped** (2026-10-28).
+
+vital-core is itself the CMS fleet, and every CMS site is in the US, so its
+`config/targets.yml`, Section 508 baseline, `en-US` spelling and
+`AGENTS.md` mission are correct for vital-core. A fleet made from the
+template replaces `targets.yml` anyway (README "Setting up a new
+instance", step 3). The original note is kept below for the record.
 
 Setting up this fleet meant changing almost every global value in
 `config/targets.yml`:
@@ -165,10 +179,62 @@ be removed once a release treats it like "Target closed".
 
 ## 9. One failed domain skips the optional report for all
 
-Recorded 2026-10-27. **Status: open.**
+Recorded 2026-10-27. **Status: merged upstream in
+[vital-core#281](https://github.com/mgifford/vital-core/pull/281); merged
+here 2026-10-28.**
 
 In the same run, the `optional-report` job was skipped because it requires
 `needs.scan.result == 'success'`, and Walsall's job had failed. Each domain's
 data is committed on its own, so the three councils that worked could have
 been reported. Suggested fix in upstream `scan.yml`: also accept
 `needs.scan.result == 'failure'` (not `cancelled`) for the optional report.
+
+## 10. A homepage redirect to another subdomain stops the crawl
+
+Recorded 2026-10-28. **Status: open.**
+
+The crawler keeps a link only when its host matches `target.domain`, with a
+leading `www.` ignored (`normalizeUrl` in `src/lib/urls.js`; `src/scan.js`
+around line 388). Walsall serves its pages and links from
+`go.walsall.gov.uk`, so a target of `walsall.gov.uk` that redirects there
+would drop every link and scan only the homepage. This fleet therefore keeps
+`go.walsall.gov.uk`. Other councils may use a similar subdomain.
+
+Suggested fix: when the homepage (or the first seed) redirects to a
+different host on the same registrable domain, log it and scope links to the
+final host, or fail the config check with a message saying which host to
+use.
+
+## 11. A page that fails three times is never retried
+
+Recorded 2026-10-28. **Status: open.**
+
+`www.blackburn.gov.uk` timed out on its homepage in all three first-week
+runs (30 s `page.goto` timeouts; 0 pages recorded). Each failure increments
+`failCount`, which only resets on a successful scan (`src/scan.js` around
+line 426), but `pickBatch()` and `budgetStatus()` skip pages with
+`failCount >= 3` (`src/lib/state.js`). So the homepage is never tried
+again, the domain's frontier counts as empty, and the scheduled matrix
+skips the domain from then on. A site that is down for three runs in a row
+drops out for good. This fleet sidestepped it by renaming the target to
+`blackburn.gov.uk` (a new key, so fresh crawl state) and raising its
+`nav_timeout_ms` to 60000.
+
+Suggested fix: let failed pages be retried after a cool-off, for example
+once per ISO week, or reset `failCount` when a new week starts, so a
+temporary outage costs a week's coverage at most.
+
+## 12. No way to see why a site won't load for the scanner
+
+Recorded 2026-10-28. **Status: merged upstream in
+[vital-core#282](https://github.com/mgifford/vital-core/pull/282); merged
+here 2026-10-29.**
+
+The first week's scans recorded only a status code or an error per page:
+`www.lbhf.gov.uk` gave 202s and 404s, and `www.blackburn.gov.uk` timed out.
+Nothing showed the redirect chain, the headers that identify a firewall or
+CDN, or what a slow page was still loading, and the development sandbox
+can't reach the sites. vital-core#282 adds a manual `diagnose` workflow
+(`scripts/probe-targets.js`) that reports all of these from GitHub's
+network. Run it (Actions → diagnose) before asking a council to allowlist
+the scanner.
