@@ -39,11 +39,11 @@ and vital-core's open issues and PRs, and link instead of repeating.
 | 8 | A Lighthouse race crashes the whole scan | merged upstream [vital-core#280](https://github.com/mgifford/vital-core/pull/280); merged here 2026-10-27 |
 | 9 | One failed domain skips the optional report for all | merged upstream [vital-core#281](https://github.com/mgifford/vital-core/pull/281); merged here 2026-10-28 |
 | 10 | A homepage redirect to another subdomain stops the crawl | open; [vital-core#283](https://github.com/mgifford/vital-core/pull/283) handles apex/`www.` and `http`/`https` redirects, not another subdomain |
-| 11 | A page that fails three times is never retried | PR open upstream: [vital-core#283](https://github.com/mgifford/vital-core/pull/283) (retried once a week) |
+| 11 | A page that fails three times is never retried | merged upstream [vital-core#283](https://github.com/mgifford/vital-core/pull/283) (retried once a week); merged here 2026-10-29 |
 | 12 | No way to see why a site won't load for the scanner | merged upstream [vital-core#282](https://github.com/mgifford/vital-core/pull/282) (`diagnose` workflow); merged here 2026-10-29 |
 | 13 | Renaming a target's domain drops its history from the report | open |
-| 14 | `http://` sitemap URLs are scanned as separate pages | PR open upstream: [vital-core#283](https://github.com/mgifford/vital-core/pull/283) (canonical URLs) |
-| 15 | A blocked site is left off the dashboard, or scored on its firewall's page | PR open upstream: [vital-core#283](https://github.com/mgifford/vital-core/pull/283) (blocked-sites notice) |
+| 14 | `http://` sitemap URLs are scanned as separate pages | merged upstream [vital-core#283](https://github.com/mgifford/vital-core/pull/283) (canonical URLs); merged here 2026-10-29 |
+| 15 | A blocked site is left off the dashboard, or scored on its firewall's page | merged upstream [vital-core#283](https://github.com/mgifford/vital-core/pull/283) (blocked-sites notice); merged here 2026-10-29 |
 | 16 | `WAF-ALLOWLIST.md` keeps a CMS-only "Currently blocked" table in a shared doc | open |
 
 ## 1. Spell check is US English only
@@ -216,7 +216,8 @@ use.
 
 ## 11. A page that fails three times is never retried
 
-Recorded 2026-10-28. **Status: PR open upstream, [vital-core#283](https://github.com/mgifford/vital-core/pull/283).** A page that
+Recorded 2026-10-28. **Status: merged upstream in [vital-core#283](https://github.com/mgifford/vital-core/pull/283); merged here
+2026-10-29.** A page that
 failed three times is tried once more each week (`lastFailedWeek`).
 
 `www.blackburn.gov.uk` timed out on its homepage in all three first-week
@@ -267,7 +268,8 @@ when a target has no data directory but a `www.`-equivalent one does.
 
 ## 14. `http://` sitemap URLs are scanned as separate pages
 
-Recorded 2026-10-29. **Status: PR open upstream, [vital-core#283](https://github.com/mgifford/vital-core/pull/283).**
+Recorded 2026-10-29. **Status: merged upstream in [vital-core#283](https://github.com/mgifford/vital-core/pull/283); merged here
+2026-10-29.**
 
 Walsall's sitemap lists `http://go.walsall.gov.uk/…` URLs, and every one
 redirects to `https://`. `normalizeUrl()` kept the scheme as written, so 453
@@ -283,7 +285,8 @@ sites.
 
 ## 15. A blocked site is left off the dashboard, or scored on its firewall's page
 
-Recorded 2026-10-29. **Status: PR open upstream, [vital-core#283](https://github.com/mgifford/vital-core/pull/283).**
+Recorded 2026-10-29. **Status: merged upstream in [vital-core#283](https://github.com/mgifford/vital-core/pull/283); merged here
+2026-10-29.**
 
 After the domain fixes the dashboard showed four councils of five, with no
 word about Blackburn: GitHub's network can't connect to it (diagnose run,
