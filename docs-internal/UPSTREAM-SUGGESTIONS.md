@@ -38,10 +38,13 @@ and vital-core's open issues and PRs, and link instead of repeating.
 | 7 | Wappalyzer fingerprints are stale | merged upstream [vital-core#280](https://github.com/mgifford/vital-core/pull/280); merged here 2026-10-27 |
 | 8 | A Lighthouse race crashes the whole scan | merged upstream [vital-core#280](https://github.com/mgifford/vital-core/pull/280); merged here 2026-10-27 |
 | 9 | One failed domain skips the optional report for all | merged upstream [vital-core#281](https://github.com/mgifford/vital-core/pull/281); merged here 2026-10-28 |
-| 10 | A homepage redirect to another subdomain stops the crawl | open |
-| 11 | A page that fails three times is never retried | open |
+| 10 | A homepage redirect to another subdomain stops the crawl | open; [vital-core#283](https://github.com/mgifford/vital-core/pull/283) handles apex/`www.` and `http`/`https` redirects, not another subdomain |
+| 11 | A page that fails three times is never retried | PR open upstream: [vital-core#283](https://github.com/mgifford/vital-core/pull/283) (retried once a week) |
 | 12 | No way to see why a site won't load for the scanner | merged upstream [vital-core#282](https://github.com/mgifford/vital-core/pull/282) (`diagnose` workflow); merged here 2026-10-29 |
 | 13 | Renaming a target's domain drops its history from the report | open |
+| 14 | `http://` sitemap URLs are scanned as separate pages | PR open upstream: [vital-core#283](https://github.com/mgifford/vital-core/pull/283) (canonical URLs) |
+| 15 | A blocked site is left off the dashboard, or scored on its firewall's page | PR open upstream: [vital-core#283](https://github.com/mgifford/vital-core/pull/283) (blocked-sites notice) |
+| 16 | `WAF-ALLOWLIST.md` keeps a CMS-only "Currently blocked" table in a shared doc | open |
 
 ## 1. Spell check is US English only
 
@@ -192,7 +195,10 @@ been reported. Suggested fix in upstream `scan.yml`: also accept
 
 ## 10. A homepage redirect to another subdomain stops the crawl
 
-Recorded 2026-10-28. **Status: open.**
+Recorded 2026-10-28. **Status: open.** [vital-core#283](https://github.com/mgifford/vital-core/pull/283) resolves each site's canonical
+origin from its homepage redirect, but only within the same site (apex and
+`www.`, `http` and `https`); a redirect to another subdomain still keeps the
+configured origin and is only logged.
 
 The crawler keeps a link only when its host matches `target.domain`, with a
 leading `www.` ignored (`normalizeUrl` in `src/lib/urls.js`; `src/scan.js`
@@ -210,7 +216,8 @@ use.
 
 ## 11. A page that fails three times is never retried
 
-Recorded 2026-10-28. **Status: open.**
+Recorded 2026-10-28. **Status: PR open upstream, [vital-core#283](https://github.com/mgifford/vital-core/pull/283).** A page that
+failed three times is tried once more each week (`lastFailedWeek`).
 
 `www.blackburn.gov.uk` timed out on its homepage in all three first-week
 runs (30 s `page.goto` timeouts; 0 pages recorded). Each failure increments
@@ -257,3 +264,47 @@ Nothing warned about it. This fleet reverted both names on 2026-10-29.
 Suggested fix: a `previous_domains:` list per target that aggregate and the
 crawl-state restore read as aliases, or at least a config check that warns
 when a target has no data directory but a `www.`-equivalent one does.
+
+## 14. `http://` sitemap URLs are scanned as separate pages
+
+Recorded 2026-10-29. **Status: PR open upstream, [vital-core#283](https://github.com/mgifford/vital-core/pull/283).**
+
+Walsall's sitemap lists `http://go.walsall.gov.uk/…` URLs, and every one
+redirects to `https://`. `normalizeUrl()` kept the scheme as written, so 453
+of the 474 pages scanned in 2026-W44 were stored under `http://`, 157 pages
+were queued under both schemes, and every page cost a redirect. The URL
+lookup did a plain text match, so pasting the `https://` address of
+`/events/junior-paint-master-workshop-rob-conway-morning` found nothing.
+The "Served over HTTPS" check also always passed, because the origin was
+assumed to be `https://`. The PR records every same-site URL under the
+scheme and host the homepage redirects to, merges old duplicates, makes the
+lookup ignore scheme and `www.`, and fails the HTTPS check for HTTP-only
+sites.
+
+## 15. A blocked site is left off the dashboard, or scored on its firewall's page
+
+Recorded 2026-10-29. **Status: PR open upstream, [vital-core#283](https://github.com/mgifford/vital-core/pull/283).**
+
+After the domain fixes the dashboard showed four councils of five, with no
+word about Blackburn: GitHub's network can't connect to it (diagnose run,
+2026-10-29), and the dashboard only lists targets with an audited page.
+LBHF showed "B 80, 2 pages audited", but both pages were its AWS WAF
+challenge page (HTTP 202), which the scan audited as if it were the site;
+its other 39 pages answered 404. The existing "Blocked targets" list was
+collapsed at the bottom and only caught all-error sites. The PR records
+challenge and refusal pages as blocked (no audit), gives each target an
+access status, and lists blocked, partly blocked and unreachable sites in a
+closed `<details>` under the dashboard intro whose summary names them, with
+the cause and what to ask the council for.
+
+## 16. `WAF-ALLOWLIST.md` keeps a CMS-only "Currently blocked" table in a shared doc
+
+Recorded 2026-10-29. **Status: open.**
+
+The doc's "Currently blocked" table (www.hhs.gov, www.nih.gov), request
+template ("public U.S. government websites") and "Where to send it" section
+describe the CMS fleet, but the file is shared by every fleet, so this fleet
+can't list LBHF or Blackburn there without conflicting on the next upstream
+merge. With the dashboard now listing blocked sites and their causes, the
+table could go, and the template could take the fleet's name and country
+from config.
