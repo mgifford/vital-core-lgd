@@ -276,9 +276,10 @@ targets:
   #   webmcp: optional boolean, default false. Opt-in only — omit or set to
   #     false to leave a target unaffected. Example: webmcp: true
   #
-  # LocalGov Drupal councils (https://localgovdrupal.org/). All four run the
-  # same distribution, so a finding that recurs across them may come from
-  # shared distribution code rather than one council's content.
+  # LocalGov Drupal councils (https://localgovdrupal.org/). Each council and
+  # its web developers have approved these scans. They all run the same
+  # distribution, so a finding that recurs across them may come from shared
+  # distribution code rather than one council's content.
   #
   # Use the host each site actually serves its pages from: the crawler treats
   # example.gov.uk and www.example.gov.uk as one site, but any other
@@ -288,3 +289,4 @@ targets:
   - domain: blackburn.gov.uk       # Blackburn with Darwen Council
     nav_timeout_ms: 60000          # its homepage timed out at 30 s on every first-week run
   - domain: hackney.gov.uk         # Hackney Council
+  - domain: www.luton.gov.uk       # Luton Borough Council

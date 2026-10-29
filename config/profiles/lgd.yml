@@ -16,6 +16,7 @@ targets:
   - go.walsall.gov.uk
   - blackburn.gov.uk
   - hackney.gov.uk
+  - www.luton.gov.uk
 
 branding:
   title: "LocalGov Drupal Accessibility & Sustainability"

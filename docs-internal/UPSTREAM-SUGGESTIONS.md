@@ -40,6 +40,7 @@ and vital-core's open issues and PRs, and link instead of repeating.
 | 9 | One failed domain skips the optional report for all | merged upstream [vital-core#281](https://github.com/mgifford/vital-core/pull/281); merged here 2026-10-28 |
 | 10 | A homepage redirect to another subdomain stops the crawl | open |
 | 11 | A page that fails three times is never retried | open |
+| 12 | No way to see why a site won't load for the scanner | PR open upstream: [vital-core#282](https://github.com/mgifford/vital-core/pull/282) (`diagnose` workflow) |
 
 ## 1. Spell check is US English only
 
@@ -223,3 +224,16 @@ Suggested fix: let failed pages be retried after a cool-off, for example
 once per ISO week, or reset `failCount` when a new week starts, so a
 temporary outage costs a week's coverage at most.
 
+## 12. No way to see why a site won't load for the scanner
+
+Recorded 2026-10-28. **Status: PR open upstream,
+[vital-core#282](https://github.com/mgifford/vital-core/pull/282).**
+
+The first week's scans recorded only a status code or an error per page:
+`www.lbhf.gov.uk` gave 202s and 404s, and `www.blackburn.gov.uk` timed out.
+Nothing showed the redirect chain, the headers that identify a firewall or
+CDN, or what a slow page was still loading, and the development sandbox
+can't reach the sites. vital-core#282 adds a manual `diagnose` workflow
+(`scripts/probe-targets.js`) that reports all of these from GitHub's
+network. Once it merges here, run it before asking a council to allowlist
+the scanner.
