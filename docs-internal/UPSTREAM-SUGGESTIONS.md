@@ -314,8 +314,9 @@ from config.
 
 ## 17. "Government domain" said "uk" fails a `.gov.uk` council
 
-Recorded 2026-10-30. **Status: PR open,
-[vital-core#286](https://github.com/mgifford/vital-core/pull/286).**
+Recorded 2026-10-30. **Status: merged upstream in
+[vital-core#286](https://github.com/mgifford/vital-core/pull/286); merged here
+2026-10-30.**
 
 [Walsall's security page](https://mgifford.github.io/vital-core-lgd/reports/go.walsall.gov.uk/2026-W44/security.html)
 showed "✗ Sponsored government TLD (.gov/.mil/.edu) uk". `.gov.uk` has
@@ -327,8 +328,9 @@ setting for namespaces the built-in list lacks.
 
 ## 18. "Resolves with and without www" checked www.go.walsall.gov.uk
 
-Recorded 2026-10-30. **Status: PR open,
-[vital-core#286](https://github.com/mgifford/vital-core/pull/286).**
+Recorded 2026-10-30. **Status: merged upstream in
+[vital-core#286](https://github.com/mgifford/vital-core/pull/286); merged here
+2026-10-30.**
 
 The check prefixed `www.` to the scanned host, so for Walsall it fetched
 `www.go.walsall.gov.uk`, which nobody types, and failed. What matters is
@@ -339,8 +341,9 @@ landed. Walsall's result updates at its next scan.
 
 ## 19. Tech ↔ issues listed 1.02× pairs, with no way to see the finding
 
-Recorded 2026-10-30. **Status: PR open,
-[vital-core#286](https://github.com/mgifford/vital-core/pull/286).**
+Recorded 2026-10-30. **Status: merged upstream in
+[vital-core#286](https://github.com/mgifford/vital-core/pull/286); merged here
+2026-10-30.**
 
 [Walsall's tech ↔ issues page](https://mgifford.github.io/vital-core-lgd/reports/go.walsall.gov.uk/2026-W44/tech-findings.html)
 listed "aria-prohibited-attr (axe) 1.02×" for Google Ads, which runs on 59
