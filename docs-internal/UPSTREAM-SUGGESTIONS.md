@@ -400,9 +400,9 @@ tags stop at v7. pdf-crawler's own workflows got the same treatment in
 
 ## 23. A large PDF without a Content-Length could stop `pdf-audit`
 
-Recorded 2026-10-30. **Status: PR open upstream,
+Recorded 2026-10-30. **Status: merged upstream in
 [vital-core#291](https://github.com/mgifford/vital-core/pull/291); merged
-here ahead of it (in #14) so this fleet's tests pass.**
+here 2026-10-30 (in #14, ahead of the upstream merge).**
 
 `tests/unit/pdf-fetch.test.js` failed in #14's CI with an uncaught
 `ERR_STREAM_DESTROYED`, and locally about once in 40 runs. When a download
