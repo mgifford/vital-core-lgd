@@ -383,3 +383,17 @@ Luton, 56 Hackney), but nothing checked them. The PR adds a `pdf-audit`
 workflow that checks each site's own-domain PDFs with pdf-crawler, 25 per
 site a day, plus manual runs for one site, and a PDFs page per domain. This
 fleet sets `pdf_audit: { enabled: true }` in its defaults.
+
+## 22. `pdf-audit` warned that `setup-uv@v6` runs on Node 20
+
+Recorded 2026-10-30. **Status: merged upstream in
+[vital-core#290](https://github.com/mgifford/vital-core/pull/290); merged
+here 2026-10-30.**
+
+This fleet's first `pdf-audit` run
+([41038668893](https://github.com/mgifford/vital-core-lgd/actions/runs/41038668893))
+worked but warned that `astral-sh/setup-uv@v6` targets Node 20, which
+GitHub now forces onto Node 24. The workflow is shared, so the fix went
+upstream: setup-uv v10.3.3 (Node 24), pinned by SHA because its floating
+tags stop at v7. pdf-crawler's own workflows got the same treatment in
+[pdf-crawler#298](https://github.com/mgifford/pdf-crawler/pull/298).
