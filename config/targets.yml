@@ -21,6 +21,7 @@ defaults:
   retention_weeks: 2        # page-level detail kept this long; weekly summaries kept forever
   user_agent: "vital-scans/0.1 (+https://github.com/mgifford/vital-core-lgd; accessibility and sustainability monitoring)"
   spelling_locale: en-GB     # UK councils: British "-ise" spellings (en-US, en-GB, en-CA or en-AU; per-target override below)
+  pdf_audit: { enabled: true }   # check each council's own-domain PDFs daily, 25 per site (pdf-audit workflow)
   reporting:
     max_html_issues: 50
     moderate_issue_threshold_percent: 5
