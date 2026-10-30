@@ -383,3 +383,30 @@ Luton, 56 Hackney), but nothing checked them. The PR adds a `pdf-audit`
 workflow that checks each site's own-domain PDFs with pdf-crawler, 25 per
 site a day, plus manual runs for one site, and a PDFs page per domain. This
 fleet sets `pdf_audit: { enabled: true }` in its defaults.
+
+## 22. `pdf-audit` warned that `setup-uv@v6` runs on Node 20
+
+Recorded 2026-10-30. **Status: merged upstream in
+[vital-core#290](https://github.com/mgifford/vital-core/pull/290); merged
+here 2026-10-30.**
+
+This fleet's first `pdf-audit` run
+([41038668893](https://github.com/mgifford/vital-core-lgd/actions/runs/41038668893))
+worked but warned that `astral-sh/setup-uv@v6` targets Node 20, which
+GitHub now forces onto Node 24. The workflow is shared, so the fix went
+upstream: setup-uv v10.3.3 (Node 24), pinned by SHA because its floating
+tags stop at v7. pdf-crawler's own workflows got the same treatment in
+[pdf-crawler#298](https://github.com/mgifford/pdf-crawler/pull/298).
+
+## 23. A large PDF without a Content-Length could stop `pdf-audit`
+
+Recorded 2026-10-30. **Status: PR open upstream,
+[vital-core#291](https://github.com/mgifford/vital-core/pull/291); merged
+here ahead of it (in #14) so this fleet's tests pass.**
+
+`tests/unit/pdf-fetch.test.js` failed in #14's CI with an uncaught
+`ERR_STREAM_DESTROYED`, and locally about once in 40 runs. When a download
+streamed past `max_file_mb`, `fetchPdf()` destroyed the file stream with a
+write still in flight; that write's error had no listener, so a real run
+would have stopped at the first such PDF. The fix downloads through
+`stream.pipeline()`: 0 failures in 200 runs.
