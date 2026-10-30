@@ -397,3 +397,16 @@ GitHub now forces onto Node 24. The workflow is shared, so the fix went
 upstream: setup-uv v10.3.3 (Node 24), pinned by SHA because its floating
 tags stop at v7. pdf-crawler's own workflows got the same treatment in
 [pdf-crawler#298](https://github.com/mgifford/pdf-crawler/pull/298).
+
+## 23. A large PDF without a Content-Length could stop `pdf-audit`
+
+Recorded 2026-10-30. **Status: PR open upstream,
+[vital-core#291](https://github.com/mgifford/vital-core/pull/291); merged
+here ahead of it (in #14) so this fleet's tests pass.**
+
+`tests/unit/pdf-fetch.test.js` failed in #14's CI with an uncaught
+`ERR_STREAM_DESTROYED`, and locally about once in 40 runs. When a download
+streamed past `max_file_mb`, `fetchPdf()` destroyed the file stream with a
+write still in flight; that write's error had no listener, so a real run
+would have stopped at the first such PDF. The fix downloads through
+`stream.pipeline()`: 0 failures in 200 runs.
