@@ -372,12 +372,14 @@ uses stdio and serves no static files, so it was not exposed.
 
 ## 21. Check the PDFs the councils link to
 
-Recorded 2026-10-30. **Status: PR open,
-[vital-core#288](https://github.com/mgifford/vital-core/pull/288)** (after
-[pdf-crawler#296](https://github.com/mgifford/pdf-crawler/pull/296)).
+Recorded 2026-10-30. **Status: merged upstream in
+[vital-core#288](https://github.com/mgifford/vital-core/pull/288) and
+[#289](https://github.com/mgifford/vital-core/pull/289) (with
+[pdf-crawler#296](https://github.com/mgifford/pdf-crawler/pull/296)); merged
+here and enabled 2026-10-30.**
 
 The scans list 719 PDFs across this fleet's councils (306 Walsall, 357
 Luton, 56 Hackney), but nothing checked them. The PR adds a `pdf-audit`
 workflow that checks each site's own-domain PDFs with pdf-crawler, 25 per
-site a day, plus manual runs for one site, and a PDFs page per domain. Once
-it merges, this fleet sets `pdf_audit: { enabled: true }` in its defaults.
+site a day, plus manual runs for one site, and a PDFs page per domain. This
+fleet sets `pdf_audit: { enabled: true }` in its defaults.
