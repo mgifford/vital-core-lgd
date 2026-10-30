@@ -357,3 +357,27 @@ technologies on nearly every page as not compared, and links each finding
 to its Accessibility report. On this fleet's W44 data no pair reaches 1.5×:
 the failures are on nearly every page either way, so they come from shared
 templates.
+
+## 20. Dependabot: `@hono/node-server` serveStatic double decode
+
+Recorded 2026-10-30. **Status: merged upstream in
+[vital-core#287](https://github.com/mgifford/vital-core/pull/287); merged here
+2026-10-30.**
+
+[Dependabot alert 7](https://github.com/mgifford/vital-core-lgd/security/dependabot/7)
+flagged `@hono/node-server` 2.0.11 (patched in 2.1.3), which arrives through
+`@modelcontextprotocol/sdk`; Dependabot timed out creating the update. The
+lockfile is shared by every fleet, so the bump went upstream. The MCP server
+uses stdio and serves no static files, so it was not exposed.
+
+## 21. Check the PDFs the councils link to
+
+Recorded 2026-10-30. **Status: PR open,
+[vital-core#288](https://github.com/mgifford/vital-core/pull/288)** (after
+[pdf-crawler#296](https://github.com/mgifford/pdf-crawler/pull/296)).
+
+The scans list 719 PDFs across this fleet's councils (306 Walsall, 357
+Luton, 56 Hackney), but nothing checked them. The PR adds a `pdf-audit`
+workflow that checks each site's own-domain PDFs with pdf-crawler, 25 per
+site a day, plus manual runs for one site, and a PDFs page per domain. Once
+it merges, this fleet sets `pdf_audit: { enabled: true }` in its defaults.
