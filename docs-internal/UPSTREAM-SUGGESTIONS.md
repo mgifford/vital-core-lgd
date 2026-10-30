@@ -311,3 +311,46 @@ can't list LBHF or Blackburn there without conflicting on the next upstream
 merge. With the dashboard now listing blocked sites and their causes, the
 table could go, and the template could take the fleet's name and country
 from config.
+
+## 17. "Government domain" said "uk" fails a `.gov.uk` council
+
+Recorded 2026-10-30. **Status: PR open,
+[vital-core#286](https://github.com/mgifford/vital-core/pull/286).**
+
+[Walsall's security page](https://mgifford.github.io/vital-core-lgd/reports/go.walsall.gov.uk/2026-W44/security.html)
+showed "✗ Sponsored government TLD (.gov/.mil/.edu) uk". `.gov.uk` has
+counted since vital-core#281, but each security check is stored with the
+scan that ran it, so a result from before then kept the old label and the
+fail. The PR re-derives the check from the domain at build time, names the
+country ("gov.uk (United Kingdom)"), and adds a `government_domains`
+setting for namespaces the built-in list lacks.
+
+## 18. "Resolves with and without www" checked www.go.walsall.gov.uk
+
+Recorded 2026-10-30. **Status: PR open,
+[vital-core#286](https://github.com/mgifford/vital-core/pull/286).**
+
+The check prefixed `www.` to the scanned host, so for Walsall it fetched
+`www.go.walsall.gov.uk`, which nobody types, and failed. What matters is
+whether `walsall.gov.uk` and `www.walsall.gov.uk` answer, by redirecting to
+`go.` or otherwise, rather than with an error. The PR checks the registrable
+domain with and without `www.` (Public Suffix List) and says where each
+landed. Walsall's result updates at its next scan.
+
+## 19. Tech ↔ issues listed 1.02× pairs, with no way to see the finding
+
+Recorded 2026-10-30. **Status: PR open,
+[vital-core#286](https://github.com/mgifford/vital-core/pull/286).**
+
+[Walsall's tech ↔ issues page](https://mgifford.github.io/vital-core-lgd/reports/go.walsall.gov.uk/2026-W44/tech-findings.html)
+listed "aria-prohibited-attr (axe) 1.02×" for Google Ads, which runs on 59
+of 60 pages: lift against all pages is about 1 for any finding there. Eleven
+Alfa rules showed the same "26 / 47": Alfa runs on half of this fleet's
+pages, but every page with tech data was counted, so findings on every page
+Alfa checked looked tied to whatever technology the sample favoured. No row
+linked to the finding. The PR compares pages with and without each
+technology per engine, lists pairs at least 1.5 times as common, names the
+technologies on nearly every page as not compared, and links each finding
+to its Accessibility report. On this fleet's W44 data no pair reaches 1.5×:
+the failures are on nearly every page either way, so they come from shared
+templates.
