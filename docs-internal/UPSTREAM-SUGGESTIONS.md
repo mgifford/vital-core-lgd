@@ -45,7 +45,7 @@ and vital-core's open issues and PRs, and link instead of repeating.
 | 14 | `http://` sitemap URLs are scanned as separate pages | merged upstream [vital-core#283](https://github.com/mgifford/vital-core/pull/283) (canonical URLs); merged here 2026-10-29 |
 | 15 | A blocked site is left off the dashboard, or scored on its firewall's page | merged upstream [vital-core#283](https://github.com/mgifford/vital-core/pull/283) (blocked-sites notice); merged here 2026-10-29 |
 | 16 | `WAF-ALLOWLIST.md` keeps a CMS-only "Currently blocked" table in a shared doc | open |
-| 24 | Cross-engine correlations can be mistaken for remediation tasks | implemented on local vital-core branch `feat/evidence-reporting`; upstream PR pending |
+| 24 | Cross-engine correlations can be mistaken for remediation tasks | merged upstream [vital-core#292](https://github.com/mgifford/vital-core/pull/292); merged here 2026-11-04 |
 
 ## 1. Spell check is US English only
 
@@ -414,8 +414,9 @@ would have stopped at the first such PDF. The fix downloads through
 
 ## 24. Cross-engine correlations can be mistaken for remediation tasks
 
-Recorded 2026-11-04. **Status: implemented locally in vital-core on
-`feat/evidence-reporting`; upstream PR pending after this LGD handoff.**
+Recorded 2026-11-04. **Status: merged upstream in
+[vital-core#292](https://github.com/mgifford/vital-core/pull/292); merged
+here 2026-11-04.**
 
 Walsall's 2026-W45 review asked whether four axe/Alfa pairs were duplicate
 findings. The old report could show overlapping WCAG criteria and pages as
