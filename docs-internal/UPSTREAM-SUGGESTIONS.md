@@ -46,6 +46,7 @@ and vital-core's open issues and PRs, and link instead of repeating.
 | 15 | A blocked site is left off the dashboard, or scored on its firewall's page | merged upstream [vital-core#283](https://github.com/mgifford/vital-core/pull/283) (blocked-sites notice); merged here 2026-10-29 |
 | 16 | `WAF-ALLOWLIST.md` keeps a CMS-only "Currently blocked" table in a shared doc | open |
 | 24 | Cross-engine correlations can be mistaken for remediation tasks | merged upstream [vital-core#292](https://github.com/mgifford/vital-core/pull/292); merged here 2026-11-04 |
+| 25 | A shared third-party component and one form with many URLs make findings look like many defects | merged upstream [vital-core#293](https://github.com/mgifford/vital-core/pull/293); merged here 2026-11-04 (Walsall settings only) |
 
 ## 1. Spell check is US English only
 
@@ -509,3 +510,35 @@ Upstream implementation is committed locally on `feat/evidence-reporting`
 (base `ccf465dee6a15d2a15c5266f53f02be5538d97d5`; Phase B `f2288665b5`,
 Phase E `0eabeca87c`, Phase F `be35d45f10`). This LGD pull request carries only
 this handoff note; it does not change `vital-core` or `vital-core-nsf`.
+
+## 25. A shared component and one form with many URLs make findings look like many defects
+
+Recorded 2026-11-04. **Status: merged upstream in
+[vital-core#293](https://github.com/mgifford/vital-core/pull/293); merged here
+2026-11-04 with Walsall's settings.**
+
+Walsall reported 73 feedback-form URLs and 292 URLs for five consent-dialog
+rules. In 2026-W45 (scan window 2026-11-02 to 2026-11-03, 12 runs) those are
+the cumulative counts after run 6; the finished week has 132 feedback URLs
+(Good 41, Poor 57, Ok 34, across 128 parent pages) and 585 audited URLs out of
+597. The three rating states differ only in the form `action`, the preselected
+radio and per-request tokens.
+
+Common code upstream (`component_signatures`, `page_families`, the Scope of
+analysis views and additive API v1 fields) is opt-in and vendor-neutral. LGD
+keeps only the Walsall configuration in `config/targets.yml`: the Quantcast
+Choice signature (`qc-cmp2`, scripts from `inmobi.com` and `quantserve.com`)
+and the `/feedback` family. Run over the W45 records, the 31 engine findings
+split into 7 verified shared-component findings, 4 mixed, 17 not attributed and
+3 undetermined. Every observation is still counted; only the page-specific
+view leaves out the 7 verified ones.
+
+### Open questions and limits
+
+- Attribution uses stored examples (five per rule across the week), so counts
+  are sample-based.
+- `color-contrast` and `region` on the consent UI use hashed `css-*` classes and
+  stay "not attributed" until a further signal is confirmed by a person.
+- The scanner does not record whether the consent dialog was open or closed.
+  Testing both states needs a bounded experiment and is not part of this change.
+- No screen-reader testing of the new report section was done.
