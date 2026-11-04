@@ -48,6 +48,7 @@ and vital-core's open issues and PRs, and link instead of repeating.
 | 24 | Cross-engine correlations can be mistaken for remediation tasks | merged upstream [vital-core#292](https://github.com/mgifford/vital-core/pull/292); merged here 2026-11-04 |
 | 25 | A shared third-party component and one form with many URLs make findings look like many defects | merged upstream [vital-core#293](https://github.com/mgifford/vital-core/pull/293); merged here 2026-11-04 (Walsall settings only) |
 | 26 | The scanner does not record what a shared component looked like at audit time | merged upstream [vital-core#294](https://github.com/mgifford/vital-core/pull/294); merged here 2026-11-04 |
+| 27 | Shared-component findings still lead the action queue; placeholder text was corrupted | merged upstream [vital-core#295](https://github.com/mgifford/vital-core/pull/295); merged here 2026-11-04 |
 
 ## 1. Spell check is US English only
 
@@ -570,3 +571,35 @@ and not meant to be comparable between sites or regions.
 - The scheduled scans run on GitHub's `ubuntu-latest` runners. Whether that
   explains the different dialog is a hypothesis until the observation is read.
 - Components rendered only inside an iframe or closed shadow root are not seen.
+
+## 27. Shared-component findings still lead the action queue; placeholder text was corrupted
+
+Recorded 2026-11-04. **Status: merged upstream in
+[vital-core#295](https://github.com/mgifford/vital-core/pull/295); merged here
+2026-11-04.**
+
+Reading the live Walsall 2026-W45 report after suggestions 25 and 26 found that
+nine of the top 10 "Next 10 actions" and the Training priorities table were
+still consent-dialog failures labelled "unattributed component", `color-contrast`
+and `region` (823 pages each) were not attributed because their stored selectors
+show no ancestry, and the report printed "31ot not attributed" (the translation
+helper replaced `@n` inside `@not`).
+
+Upstream now fixes the placeholder substitution, marks axe examples at scan time
+when the element or a real DOM ancestor carries a configured signature, badges
+verified shared-component actions and adds a diagnostic list of the top actions
+outside them, notes verified shared rules in Training priorities, opens the
+Accessibility and landing pages with a scope summary, and says when a finding's
+URLs all belong to a declared page family. No LGD settings change; scores and
+rankings are unchanged.
+
+### Open questions and limits
+
+- Component marks exist only for pages scanned after this change, so
+  `color-contrast` and `region` should move to "shared component" gradually.
+  Check the live report after the next scans.
+- Alfa findings (`sia-r68`, `sia-r73`, `sia-r74`, `sia-r111`) cannot be traced to
+  elements and are expected to stay "mixed".
+- Ownership (third-party, theme, distribution) is still not established.
+- The dialog the scanner audits may differ from the one UK visitors see; see
+  suggestion 26.
