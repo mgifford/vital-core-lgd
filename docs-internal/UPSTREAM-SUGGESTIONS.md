@@ -45,6 +45,7 @@ and vital-core's open issues and PRs, and link instead of repeating.
 | 14 | `http://` sitemap URLs are scanned as separate pages | merged upstream [vital-core#283](https://github.com/mgifford/vital-core/pull/283) (canonical URLs); merged here 2026-10-29 |
 | 15 | A blocked site is left off the dashboard, or scored on its firewall's page | merged upstream [vital-core#283](https://github.com/mgifford/vital-core/pull/283) (blocked-sites notice); merged here 2026-10-29 |
 | 16 | `WAF-ALLOWLIST.md` keeps a CMS-only "Currently blocked" table in a shared doc | open |
+| 24 | Cross-engine correlations can be mistaken for remediation tasks | implemented on local vital-core branch `feat/evidence-reporting`; upstream PR pending |
 
 ## 1. Spell check is US English only
 
@@ -410,3 +411,100 @@ streamed past `max_file_mb`, `fetchPdf()` destroyed the file stream with a
 write still in flight; that write's error had no listener, so a real run
 would have stopped at the first such PDF. The fix downloads through
 `stream.pipeline()`: 0 failures in 200 runs.
+
+## 24. Cross-engine correlations can be mistaken for remediation tasks
+
+Recorded 2026-11-04. **Status: implemented locally in vital-core on
+`feat/evidence-reporting`; upstream PR pending after this LGD handoff.**
+
+Walsall's 2026-W45 review asked whether four axe/Alfa pairs were duplicate
+findings. The old report could show overlapping WCAG criteria and pages as
+"possible duplicate", which readers could mistake for two observations being
+one remediation task. Matching a criterion or URL is not evidence that engines
+tested the same target. The current checked-in scan data is in the separate
+data repository, so the exact W45 report artifact is not committed in this
+fleet checkout; the classifications below are backed by the supplied W45
+observations and sanitized, repeatable fixtures, not a byte-for-byte archived
+before/after HTML capture.
+
+### Walsall pair findings
+
+| axe | Alfa | Evidence and result |
+|---|---|---|
+| `color-contrast` | `sia-r69` | **Uncertain.** The sampled text overlaps ("Opted In"), but Alfa's text target does not identify a unique element. `sia-r69` is absent from the checked-in ACT mapping; axe maps to `afw4f7` and `09o5cg` (Approved). Do not fill the missing mapping by inference. |
+| `list` | `sia-r68` | **Related.** The sample points to the same consent `<ul>`, but only Alfa maps to `bc4a75` (Proposed); axe `list` is unmapped. |
+| `aria-required-parent` | `sia-r42` | **Same sampled button / equivalent check.** Both map to `ff89c9` (Proposed). The rule findings aggregate capped observations, so the full pair remains related rather than being marked wholly duplicate. |
+| `button-name` | `sia-r8` | **Related, not duplicate.** The sampled switch matches, but the ACT identities differ: axe maps to `97a4e1` and `m6b1q3` (Approved), Alfa to `e086e5` (Approved). This pair had previously been reported as a duplicate. |
+
+The original report could promote page/WCAG overlap to a duplicate and did not
+show per-rule ACT status and target evidence together. The improved report
+retains each axe and Alfa finding, shows all ACT mappings/statuses, labels
+confirmed/possible/related/uncertain cases distinctly, and says when a matching
+sample does not establish a duplicate of the whole aggregate. Only complete,
+one-to-one same-element evidence with a shared ACT Rule forms one reporting
+group. A likely shared component alone does not establish one fix.
+
+### Honeypot investigation
+
+The live Walsall `/feedback` page is built on LocalGov Drupal and currently
+shows a wrapper like `div.js-form-item.form-item-url[aria-labelledby]` with a
+"Leave this field blank" label and a `name="url"` text input styled
+`display:none`. The wrapper itself has the implicit `generic` role and is
+present in the accessibility snapshot; the child input is removed from the
+accessibility tree by `display:none` and is not in the tab order. A separately
+clipped, `tabindex="0"` control remains keyboard-focusable. ACT applicability
+is evaluated per target: hidden controls are not promoted to failures, while
+an in-tree prohibited attribute remains a finding.
+
+This resembles a Honeypot anti-spam field, but the public rendered markup and
+the fleet's LocalGov Drupal profile do not prove which module or theme emitted
+it. No source-level module attribution was established. There is no
+Honeypot-specific exception; attribution and the correct component owner remain
+open pending source confirmation.
+
+### Shared implementation and compatibility
+
+Reusable work belongs in vital-core, not an LGD-specific scanner fork:
+
+- `src/lib/finding-correlation.js` retains observations, ACT status and bounded
+  pair evidence; `src/lib/finding-reporting.js` derives conservative
+  duplicate groups without mutating the inputs.
+- `src/lib/api-writer.js`, `src/api/schema/findings.schema.json`,
+  `src/report-html.js` and the read-only MCP finding tools expose the same
+  additive evidence. Public examples are sanitized copies: text/form values,
+  event handlers, arbitrary data attributes and executable elements are
+  omitted. Raw scanner page records are not rewritten.
+- `src/lib/component-clusters.js` now calls cluster totals engine observations,
+  not verified fixes; task count is unknown and ownership is not inferred.
+- Sanitized shared fixtures are `tests/fixtures/walsall-consent.html` and
+  `tests/fixtures/honeypot-applicability.html`. Regression coverage in
+  `tests/e2e.mjs` runs axe and Alfa against them. Unit tests cover URL identity,
+  stable finding history, severity preservation, coverage loss, API/MCP fields
+  and conservative group counts.
+
+The JSON changes are additive to API v1: no schema version bump, migration,
+finding-ID/page-ID change or deep-link change is needed. LGD has no
+Honeypot-specific configuration change and should not add an exclusion or
+allowlist for this rule. This section is the only LGD-specific deliverable;
+the code and fixtures are shared upstream changes.
+
+### Open questions and limits
+
+- Confirm the Honeypot field's source module/theme with Walsall or a source
+  repository. Do not assign component ownership from the `url` field name.
+- Reconcile the current Alfa implementation report for `sia-r69` with the
+  checked-in ACT mapping. Until reviewed, keep it unmapped and its correlation
+  uncertain.
+- URL totals count exact distinct URLs in retained evidence, including query
+  variants. If evidence is capped, publish that it is a sample; do not infer
+  unseen distinct URLs or page-ID equivalence from similar DOM structure.
+- Remediation groups are not a count of code changes. Humans still decide
+  whether related findings share a fix and who owns it.
+- The tests exercise sanitized representative fixtures. They do not prove the
+  current production Walsall page is identical or replace screen-reader
+  testing. No human screen-reader verification was performed for this handoff.
+
+Upstream implementation is committed locally on `feat/evidence-reporting`
+(base `ccf465dee6a15d2a15c5266f53f02be5538d97d5`; Phase B `f2288665b5`,
+Phase E `0eabeca87c`, Phase F `be35d45f10`). This LGD pull request carries only
+this handoff note; it does not change `vital-core` or `vital-core-nsf`.
