@@ -47,6 +47,7 @@ and vital-core's open issues and PRs, and link instead of repeating.
 | 16 | `WAF-ALLOWLIST.md` keeps a CMS-only "Currently blocked" table in a shared doc | open |
 | 24 | Cross-engine correlations can be mistaken for remediation tasks | merged upstream [vital-core#292](https://github.com/mgifford/vital-core/pull/292); merged here 2026-11-04 |
 | 25 | A shared third-party component and one form with many URLs make findings look like many defects | merged upstream [vital-core#293](https://github.com/mgifford/vital-core/pull/293); merged here 2026-11-04 (Walsall settings only) |
+| 26 | The scanner does not record what a shared component looked like at audit time | merged upstream [vital-core#294](https://github.com/mgifford/vital-core/pull/294); merged here 2026-11-04 |
 
 ## 1. Spell check is US English only
 
@@ -539,6 +540,33 @@ view leaves out the 7 verified ones.
   are sample-based.
 - `color-contrast` and `region` on the consent UI use hashed `css-*` classes and
   stay "not attributed" until a further signal is confirmed by a person.
-- The scanner does not record whether the consent dialog was open or closed.
-  Testing both states needs a bounded experiment and is not part of this change.
+- The scanner did not record whether the consent dialog was open or closed;
+  suggestion 26 adds that best-effort record. Testing a second state after a
+  decision is not part of either change.
 - No screen-reader testing of the new report section was done.
+
+## 26. The scanner does not record what a shared component looked like at audit time
+
+Recorded 2026-11-04. **Status: merged upstream in
+[vital-core#294](https://github.com/mgifford/vital-core/pull/294); merged here
+2026-11-04.**
+
+A probe from a non-US client did not reproduce Walsall's recorded consent-dialog
+failures (the stored text, such as "Opted In" and the toggle switches, did not
+appear in either dialog view seen), so the dialog a visitor gets can differ from
+the one the scanner audits. Nothing in the page records said which.
+
+For targets with `component_signatures`, the scanner now takes a read-only
+snapshot before the audits: component present, visible, shown as a dialog, and up
+to 6 visible button labels, plus the user agent and viewport used in each run.
+Aggregate rolls it up and the Scope of analysis section shows it with a caveat.
+No LGD settings change; Walsall's existing signature is used. It is best effort
+and not meant to be comparable between sites or regions.
+
+### Open questions and limits
+
+- After the next Walsall scan, read the stored observation before deciding
+  whether to scan a second state after a consent decision.
+- The scheduled scans run on GitHub's `ubuntu-latest` runners. Whether that
+  explains the different dialog is a hypothesis until the observation is read.
+- Components rendered only inside an iframe or closed shadow root are not seen.
