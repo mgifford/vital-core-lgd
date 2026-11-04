@@ -309,6 +309,20 @@ targets:
   # report are keyed on the exact domain, so a rename starts it over.
   - domain: www.lbhf.gov.uk        # Hammersmith & Fulham Council; AWS WAF challenges GitHub's runners (diagnose, 2026-10-29)
   - domain: go.walsall.gov.uk      # Walsall Council; its pages and links use go.walsall.gov.uk
+    # Shared consent dialog: Quantcast Choice (qc-cmp2-* classes; its script is served from inmobi.com).
+    # Two distinct signal types are needed, so the class prefix alone is only a candidate.
+    component_signatures:
+      - id: consent-dialog
+        label: Cookie consent dialog
+        class_prefixes: [qc-cmp2]
+        script_origins: [inmobi.com, quantserve.com]
+    # /feedback?page=...&rating=Good|Ok|Poor&title=...: one form, many URLs. Rating is a real state.
+    page_families:
+      - id: feedback-form
+        label: Page feedback form
+        route: /feedback
+        state_params: [rating]
+        variant_params: [page, title]
   - domain: blackburn.gov.uk       # Blackburn with Darwen Council
     nav_timeout_ms: 60000          # its homepage timed out at 30 s on every first-week run
   - domain: www.hackney.gov.uk     # Hackney Council
