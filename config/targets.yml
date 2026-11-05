@@ -316,6 +316,13 @@ targets:
         label: Cookie consent dialog
         class_prefixes: [qc-cmp2]
         script_origins: [inmobi.com, quantserve.com]
+    # Reject once per run so the dialog is audited once, not on every page; the scanner never accepts tracking.
+    # Selectors are the dialog's own button ids (probed 2026-11-05). If the scanner gets a variant without them, nothing is clicked.
+    consent_handling:
+      component: consent-dialog
+      choice: reject
+      reject_selectors: ['#disagree-btn']
+      accept_selectors: ['#accept-btn']
     # /feedback?page=...&rating=Good|Ok|Poor&title=...: one form, many URLs. Rating is a real state.
     page_families:
       - id: feedback-form
