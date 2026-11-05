@@ -16,3 +16,9 @@ Two usage patterns:
   After finishing the work, close the Op with the command printed in the capsule
   (`spec-kitty profile-invocation complete --invocation-id <id> --outcome <done|failed|abandoned>`).
 <!-- /spec-kitty:orientation -->
+
+For repository architecture, development rules, and validation commands, follow
+[AGENTS.md](../AGENTS.md) and [ARCHITECTURE.md](../ARCHITECTURE.md). The stable
+agent workflow surfaces are documented in
+[kitty-specs/AGENT_SURFACES.md](../kitty-specs/AGENT_SURFACES.md). Run
+`npm run check:spec-kitty` to verify the committed governance bundle.
